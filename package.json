@@ -1,0 +1,62 @@
+{
+  "name": "maestro",
+  "version": "0.5.0",
+  "author": {
+    "name": "Craig Setera"
+  },
+  "description": "Maestro Electron Web Audio Controller",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "lint": "vue-cli-service lint",
+    "electron:build": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode production && vue-cli-service electron:build",
+    "electron:serve": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode development && vue-cli-service electron:serve",
+    "generate-png-icon": "inkscape --batch-process --export-file=./public/icon.png -w 1024 -h 1024 ./public/logo.svg",
+    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/vue-fontawesome": "^0.1.8",
+    "@vue/devtools": "^5.3.3",
+    "bootstrap": "^4.4.0",
+    "bootstrap-vue": "^2.1.0",
+    "core-js": "^3.3.2",
+    "debounce": "^1.2.0",
+    "electron-store": "^5.1.1",
+    "load-awesome": "^1.1.0",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.0.2",
+    "vue-fontawesome": "^0.0.2",
+    "vue-property-decorator": "^8.3.0",
+    "vue-router": "^3.1.3",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/debounce": "^1.2.0",
+    "@types/node": "12.12.21",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "@vue/cli-plugin-babel": "^4.0.0",
+    "@vue/cli-plugin-eslint": "^4.0.0",
+    "@vue/cli-plugin-router": "^4.0.0",
+    "@vue/cli-plugin-typescript": "4.2.2",
+    "@vue/cli-plugin-vuex": "^4.0.0",
+    "@vue/cli-service": "^4.0.0",
+    "@vue/eslint-config-typescript": "^7.0.0",
+    "electron": "7.3.3",
+    "electron-icon-builder": "^1.0.2",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.12.0",
+    "prettier": "^1.18.2",
+    "sass-loader": "^8.0.0",
+    "typescript": "^4.0.5",
+    "vue-cli-plugin-electron-builder": "^1.4.2",
+    "vue-template-compiler": "^2.6.10",
+    "webpack-cli": "^3.3.10"
+  }
+}
