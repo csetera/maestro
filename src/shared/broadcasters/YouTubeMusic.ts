@@ -3,10 +3,9 @@ import BroadcasterPlayerState from '@/shared/audio/BroadcasterPlayerState';
 import AbstractBroadcaster from '@/shared/audio/AbstractBroadcaster';
 import { hasValue } from '@/shared/Utils';
 import { DEFAULT_MINI_PLAYER_BOUNDS } from '@/shared/constants/PlayerBounds';
-import { OnBeforeSendHeadersListenerDetails } from 'electron';
 
-const PREV_TRACK_SELECTOR = '#left-controls > div > paper-icon-button.previous-button.style-scope.ytmusic-player-bar';
-const NEXT_TRACK_SELECTOR = '#left-controls > div > paper-icon-button.next-button.style-scope.ytmusic-player-bar';
+const PREV_TRACK_SELECTOR = '#left-controls > div > tp-yt-paper-icon-button.previous-button.style-scope.ytmusic-player-bar';
+const NEXT_TRACK_SELECTOR = '#left-controls > div > tp-yt-paper-icon-button.next-button.style-scope.ytmusic-player-bar';
 const PLAY_PAUSE_SELECTOR = '#play-pause-button';
 
 const SLIDER_SELECTOR = '#progress-bar';
