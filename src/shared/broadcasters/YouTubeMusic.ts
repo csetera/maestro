@@ -11,7 +11,7 @@ const PLAY_PAUSE_SELECTOR = '#play-pause-button';
 const SLIDER_SELECTOR = '#progress-bar';
 const TIME_INFO_SELECTOR = '#left-controls > span.time-info';
 
-const ALBUM_ART_SELECTOR = '#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > img';
+const ALBUM_ART_SELECTOR = '#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.thumbnail-image-wrapper.style-scope.ytmusic-player-bar > img';
 const TITLE_SELECTOR = '#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.content-info-wrapper.style-scope.ytmusic-player-bar > yt-formatted-string';
 const ARTIST_SELECTOR = '#layout > ytmusic-player-bar > div.middle-controls.style-scope.ytmusic-player-bar > div.content-info-wrapper.style-scope.ytmusic-player-bar > span > span.subtitle.style-scope.ytmusic-player-bar > yt-formatted-string > a:nth-child(1)';
 
