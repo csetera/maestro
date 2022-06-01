@@ -10,6 +10,8 @@
   "scripts": {
     "lint": "vue-cli-service lint",
     "electron:build": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode production && vue-cli-service electron:build",
+    "electron:build:mac": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode production && vue-cli-service electron:build --mac",
+    "electron:build:windows": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode production && vue-cli-service electron:build --win",
     "electron:serve": "node_modules/.bin/webpack --config ./preload.webpack.config.js --mode development && vue-cli-service electron:serve",
     "generate-png-icon": "inkscape --batch-process --export-file=./public/icon.png -w 1024 -h 1024 ./public/logo.svg",
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
