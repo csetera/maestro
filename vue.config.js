@@ -6,7 +6,8 @@ module.exports = {
                 "productName": "Maestro",
                 "linux": {
                     "category": "Audio"
-                }
+                },
+                "electronVersion": "8.5.5"
             }
         }
     },

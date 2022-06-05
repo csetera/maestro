@@ -8,6 +8,7 @@
       "protocol": "inspector",
       "outputCapture": "std",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "runtimeVersion": "10",
       "windows": {
         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
       },
