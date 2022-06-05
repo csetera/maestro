@@ -5,8 +5,8 @@
     "tasks": [
         {
             "label": "electron-debug",
-            "type": "process",
-            "command": "yarn",
+            "type": "shell",
+            "command": "./scripts/electron-debug.sh",
             "isBackground": true,
             "args": [
                 "electron:serve",
