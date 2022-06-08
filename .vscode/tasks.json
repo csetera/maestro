@@ -5,7 +5,7 @@
     "tasks": [
         {
             "label": "electron-debug",
-            "type": "shell",
+            "type": "process",
             "command": "./scripts/electron-debug.sh",
             "isBackground": true,
             "args": [
@@ -18,7 +18,7 @@
                     "regexp": ""
                 },
                 "background": {
-                    "beginsPattern": "Starting development server\\.\\.\\.",
+                    "beginsPattern": "yarn run.*",
                     "endsPattern": "Not launching electron as debug argument was passed\\."
                 }
             }

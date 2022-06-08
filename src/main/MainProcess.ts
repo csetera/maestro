@@ -1,12 +1,12 @@
-import { 
-    app, 
-    BrowserWindow, 
-    BrowserWindowConstructorOptions, 
-    dialog, 
-    globalShortcut, 
-    ipcMain, 
-    MenuItem, 
-    Rectangle, 
+import {
+    app,
+    BrowserWindow,
+    BrowserWindowConstructorOptions,
+    dialog,
+    globalShortcut,
+    ipcMain,
+    MenuItem,
+    Rectangle,
     systemPreferences } from 'electron';
 import { Vue } from 'vue-property-decorator';
 import { DEFAULT_FULL_PLAYER_BOUNDS, DEFAULT_MINI_PLAYER_BOUNDS } from '@/shared/constants/PlayerBounds';
@@ -19,6 +19,7 @@ import MediaKeys from '@/shared/constants/MediaKeys';
 import path from 'path';
 import Store from 'electron-store';
 import * as IpcCommands from '@/shared/constants/IpcCommands';
+import * as LinuxPlatformSupport from '@/platform-support/LinuxPlatformSupport';
 import * as MenuEvents from '@/shared/constants/MenuEvents';
 import * as winston from 'winston';
 
@@ -30,7 +31,7 @@ const LAST_BROADCASTER = 'lastBroadcaster';
 export default class MainProcess {
     private store: Store<any>;
     private applicationMenu: ApplicationMenu;
-    
+
     private miniMode = false;
 
     private fullPlayerWindow: BrowserWindow;
@@ -78,7 +79,7 @@ export default class MainProcess {
         const rendererURL = this.getRendererURL('/mini-player');
 
         // Open and place the windows in the appropriate order
-        this.logger.debug('Loading broadcaster URL: %s', this.broadcaster!.url);        
+        this.logger.debug('Loading broadcaster URL: %s', this.broadcaster!.url);
         this.fullPlayerWindow!.webContents.loadURL(this.broadcaster!.url)
             .then(() => {
                 this.logger.debug('Loaded braodcaster URL.  Loading renderer: %s', rendererURL);
@@ -113,7 +114,7 @@ export default class MainProcess {
      * Return the bounds stored for the broadcaster.
      */
     private getStoredBroadcasterBounds(mini: boolean): Rectangle {
-        const bounds = this.store.get(this.getBoundsStorageKey(mini)) || 
+        const bounds = this.store.get(this.getBoundsStorageKey(mini)) ||
             (mini ? DEFAULT_MINI_PLAYER_BOUNDS : DEFAULT_FULL_PLAYER_BOUNDS);
         this.logger.debug('Returning bounds %o for %s', bounds, this.getBoundsStorageKey(mini));
         return bounds;
@@ -179,7 +180,7 @@ export default class MainProcess {
 
     /**
      * Handle a logged message from an IPC.
-     * 
+     *
      * @param info the log info object
      */
     private onIpcLogMessage(info: any): void {
@@ -191,8 +192,8 @@ export default class MainProcess {
 
     /**
      * Handle a media key being pressed
-     * 
-     * @param key 
+     *
+     * @param key
      */
     private onMediaKey(key: string): void {
         this.logger.debug("Media key: %s", key);
@@ -201,7 +202,7 @@ export default class MainProcess {
 
     /**
      * Handle a menu item being selected.
-     * 
+     *
      * @param menuItem
      */
     private onMenuItemSelect(menuItem: MenuItem): void {
@@ -247,8 +248,8 @@ export default class MainProcess {
     /**
      * Returns a Promise that will resolve when the specified
      * message is received.
-     * 
-     * @param message 
+     *
+     * @param message
      */
     private onMessageReceived(message: string): Promise<any[]> {
         return new Promise(function(resolve, reject) {
@@ -260,8 +261,8 @@ export default class MainProcess {
 
     /**
      * Handle a broadcaster id menu item being selected.
-     * 
-     * @param broadcasterId 
+     *
+     * @param broadcasterId
      */
     private onBroadcasterSelect(broadcasterId: string): void {
         this.logger.debug('Broadcaster select: %s', broadcasterId);
@@ -287,8 +288,8 @@ export default class MainProcess {
 
     /**
      * Update player state sent from the preload integration.
-     * 
-     * @param state 
+     *
+     * @param state
      */
     private onPlayerStateUpdate(state: BroadcasterPlayerState): void {
         this.broadcastState = state;
@@ -297,13 +298,13 @@ export default class MainProcess {
 
     /**
      * Handle toggling to/from mini player.
-     * 
+     *
      * @param menuItem
      */
     private onToggleMiniPlayer(menuItem: MenuItem): void {
         this.miniMode = !menuItem.checked;
         menuItem.checked = this.miniMode;
-        
+
         if (this.miniMode) {
             this.miniPlayerWindow!.show();
             this.fullPlayerWindow!.hide();
@@ -318,7 +319,7 @@ export default class MainProcess {
     ///////////////////////////////////////////////
 
     /**
-     * Create the BrowserWindow for the full size player. 
+     * Create the BrowserWindow for the full size player.
      */
     private createFullPlayerWindow(): BrowserWindow {
         const bounds = this.getStoredBroadcasterBounds(false);
@@ -344,7 +345,7 @@ export default class MainProcess {
     }
 
     /**
-     * Create the BrowserWindow for the mini size player. 
+     * Create the BrowserWindow for the mini size player.
      */
     private createMiniPlayerWindow(): BrowserWindow {
         const bounds = this.getStoredBroadcasterBounds(true);
@@ -362,7 +363,7 @@ export default class MainProcess {
         }, bounds) as BrowserWindowConstructorOptions;
 
         const window = new BrowserWindow(options);
-        /* this.fullPlayerWindow = undefined; */ 
+        /* this.fullPlayerWindow = undefined; */
         window.on("closed", () => { this.logger.info("Mini player closed") });
         window.on('moved', debounce(() => { this.updateStoredBroadcasterBounds(true) }));
         window.on('resize', debounce(() => { this.updateStoredBroadcasterBounds(true) }));
@@ -412,9 +413,9 @@ export default class MainProcess {
 
     /**
      * Register a handler callback function for the specified key.
-     * 
-     * @param key 
-     * @param callback 
+     *
+     * @param key
+     * @param callback
      */
     private registerMediaKeyHandler(key: MediaKeys, callback: () => void) {
         if (!globalShortcut.register(key, callback)) {
@@ -423,7 +424,7 @@ export default class MainProcess {
             throw new Error(message)
         }
     }
-    
+
     /**
      * Register handler functions for  the global media keys
      */
@@ -432,6 +433,10 @@ export default class MainProcess {
         this.registerMediaKeyHandler(MediaKeys.MEDIA_PLAY_PAUSE, () => this.onMediaKey(MediaKeys.MEDIA_PLAY_PAUSE));
         this.registerMediaKeyHandler(MediaKeys.MEDIA_STOP, () => this.onMediaKey(MediaKeys.MEDIA_STOP));
         this.registerMediaKeyHandler(MediaKeys.MEDIA_PREVIOUS_TRACK, () => this.onMediaKey(MediaKeys.MEDIA_PREVIOUS_TRACK));
+
+        if (process.platform == 'linux') {
+            LinuxPlatformSupport.registerLinuxMediaKeyHandlers(this.logger, this.onMediaKey.bind(this));
+        }
     }
 
     ///////////////////////////////////////////////
@@ -440,12 +445,12 @@ export default class MainProcess {
 
     /**
      * Return the renderer URL for the specified route.
-     * 
-     * @param route 
+     *
+     * @param route
      */
     private getRendererURL(route: string): string {
         // Pick the appropriate URL for the Renderer process
-        const baseRendererURL = process.env.WEBPACK_DEV_SERVER_URL ? 
+        const baseRendererURL = process.env.WEBPACK_DEV_SERVER_URL ?
             process.env.WEBPACK_DEV_SERVER_URL as string :  // Load the url of the dev server if in development mode
             "app://./index.html";                           // Load the index.html when not in development
 
