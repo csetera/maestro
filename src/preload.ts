@@ -11,21 +11,21 @@ const UPDATE_LOOP_MILLIS = 1000;
 const ipc = require('electron').ipcRenderer;
 
 /**
- * Interoperation class that is injected in to the audio player 
- * window as a preload script.  This script is build and published 
+ * Interoperation class that is injected in to the audio player
+ * window as a preload script.  This script is build and published
  * into the public/js folder.  The injected script is responsible
  * for managing the connection between the main Electron process
  * and the audio player, sending status updates and receiving
- * controller events.  This functionality is implemented via a 
+ * controller events.  This functionality is implemented via a
  * Broadcaster instance
- * 
+ *
  * Status updates are managed by a standard Javascript interval
  * which retrieves the status information from the Broadcaster
  * and forwards the information over IPC.
- * 
+ *
  * Events are received from the main process via IPC and provided
  * to the Broadcaster.
- * 
+ *
  * NOTE: This class is processed by Webpack and the results are
  * generated into public/js/preload.js
  */
@@ -40,7 +40,7 @@ const Interop = class Interop {
 		this.logger = LoggerFactory.createIpcLogger(ipc, 'INTEROP');
 		this.logger.info("Initializing");
 
-		ipc.on(IpcCommands.MEDIA_CONTROL, (event: any, mediaControlEvent: string) => 
+		ipc.on(IpcCommands.MEDIA_CONTROL, (event: any, mediaControlEvent: string) =>
 			this.onMediaControlEvent(mediaControlEvent));
 		ipc.on(IpcCommands.SHUTDOWN_INTEROP, (event: any, arg: string) => this.onShutdown());
 
@@ -55,8 +55,8 @@ const Interop = class Interop {
 
 	/**
 	 * Handle a media control event.
-	 * 
-	 * @param mediaControlEvent 
+	 *
+	 * @param mediaControlEvent
 	 */
 	private onMediaControlEvent(mediaControlEvent: string): void {
 		this.logger.debug('onMediaControlEvent: %s', mediaControlEvent);
@@ -67,19 +67,36 @@ const Interop = class Interop {
 				}
 				break;
 
+			case MediaKeys.MEDIA_PAUSE:
+				if (this.broadcaster) {
+					const playerState = this.broadcaster.getCurrentState();
+					if (playerState.playing) {
+						this.broadcaster.playPause();
+					}
+				}
+				break;
+
+			case MediaKeys.MEDIA_PLAY:
+				if (this.broadcaster) {
+					const playerState = this.broadcaster.getCurrentState();
+					if (!playerState.playing) {
+						this.broadcaster.playPause();
+					}
+				}
+				break;
+
 			case MediaKeys.MEDIA_PLAY_PAUSE:
 				if (this.broadcaster) {
 					this.broadcaster.playPause();
-
 				}
 				break;
-			
+
 			case MediaKeys.MEDIA_PREVIOUS_TRACK:
 				if (this.broadcaster) {
 					this.broadcaster.previousTrack();
 				}
 				break;
-			
+
 			case MediaKeys.MEDIA_STOP:
 				if (this.broadcaster) {
 					this.broadcaster.stop();
@@ -128,8 +145,8 @@ const Interop = class Interop {
 };
 
 declare global {
-    interface Window { 
-		_maestro_interop: any; 
+    interface Window {
+		_maestro_interop: any;
 		__devtron: any;
 	}
 }
