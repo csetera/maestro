@@ -10,16 +10,18 @@ import {
     systemPreferences } from 'electron';
 import { Vue } from 'vue-property-decorator';
 import { DEFAULT_FULL_PLAYER_BOUNDS, DEFAULT_MINI_PLAYER_BOUNDS } from '@/shared/constants/PlayerBounds';
+import { withLeadingCapital } from '@/shared/Utils';
 import ApplicationMenu from './ApplicationMenu';
 import Broadcaster from '@/shared/audio/Broadcaster';
 import Broadcasters, { broadcasterWithId } from '@/shared/audio/Broadcasters';
 import BroadcasterPlayerState from '@/shared/audio/BroadcasterPlayerState';
 import debounce from 'debounce';
+import IPlatformSupport from '@/platform-support/IPlatformSupport';
+import DummyPlatformSupport from '@/platform-support/DarwinPlatformSupport';
 import MediaKeys from '@/shared/constants/MediaKeys';
 import path from 'path';
 import Store from 'electron-store';
 import * as IpcCommands from '@/shared/constants/IpcCommands';
-import * as LinuxPlatformSupport from '@/platform-support/LinuxPlatformSupport';
 import * as MenuEvents from '@/shared/constants/MenuEvents';
 import * as winston from 'winston';
 
@@ -31,6 +33,8 @@ const LAST_BROADCASTER = 'lastBroadcaster';
 export default class MainProcess {
     private store: Store<any>;
     private applicationMenu: ApplicationMenu;
+
+    private platformSupport?: IPlatformSupport;
 
     private miniMode = false;
 
@@ -78,9 +82,19 @@ export default class MainProcess {
         // Pick the appropriate URL for the Renderer process
         const rendererURL = this.getRendererURL('/mini-player');
 
-        // Open and place the windows in the appropriate order
-        this.logger.debug('Loading broadcaster URL: %s', this.broadcaster!.url);
-        this.fullPlayerWindow!.webContents.loadURL(this.broadcaster!.url)
+        // Load the IPlatformSupport instance
+        const platformSupportName = `${process.platform}PlatformSupport`;
+        const platformSupportModuleName = `@/platform-support/${withLeadingCapital(platformSupportName)}`;
+        // import(platformSupportModuleName)
+        Promise.resolve({ default: DummyPlatformSupport })
+            .then((platformSupportModule) => {
+                this.platformSupport = platformSupportModule.default as IPlatformSupport;
+                console.log(this.platformSupport);
+
+                // Open and place the windows in the appropriate order
+                this.logger.debug('Loading broadcaster URL: %s', this.broadcaster!.url);
+                return this.fullPlayerWindow!.webContents.loadURL(this.broadcaster!.url);
+            })
             .then(() => {
                 this.logger.debug('Loaded braodcaster URL.  Loading renderer: %s', rendererURL);
                 return this.miniPlayerWindow.loadURL(rendererURL)
@@ -434,8 +448,8 @@ export default class MainProcess {
         this.registerMediaKeyHandler(MediaKeys.MEDIA_STOP, () => this.onMediaKey(MediaKeys.MEDIA_STOP));
         this.registerMediaKeyHandler(MediaKeys.MEDIA_PREVIOUS_TRACK, () => this.onMediaKey(MediaKeys.MEDIA_PREVIOUS_TRACK));
 
-        if (process.platform == 'linux') {
-            LinuxPlatformSupport.registerLinuxMediaKeyHandlers(this.logger, this.onMediaKey.bind(this));
+        if (this.platformSupport) {
+            this.platformSupport.registerMediaKeyHandlers(this.logger, this.onMediaKey);
         }
     }
 

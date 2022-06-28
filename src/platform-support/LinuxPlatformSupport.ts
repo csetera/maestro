@@ -1,4 +1,5 @@
 import dbus from 'dbus-next';
+import IPlatformSupport from '@/platform-support/IPlatformSupport';
 import MediaKeys from '@/shared/constants/MediaKeys';
 import mpris from 'mpris-service';
 import { app } from 'electron';
@@ -99,14 +100,13 @@ function registerMprisKeyHandler(logger: winston.Logger, callback: (mediaKey: Me
     });
 }
 
-/**
- * Register Linux-specific handlers for Media keys
- *
- * @param logger
- * @param callback
- */
-export async function registerLinuxMediaKeyHandlers(logger: winston.Logger, callback: (mediaKey: MediaKeys) => void) {
-    logger.info("Registering Linux media key handlers");
-    registerMprisKeyHandler(logger, callback);
-    await registerDbusMediaKeyHandler(logger, callback);
+class LinuxPlatformSupport implements IPlatformSupport {
+    registerMediaKeyHandlers(logger: winston.Logger, callback: (mediaKey: MediaKeys) => void): Promise<void> {
+        logger.info("Registering Linux media key handlers");
+        registerMprisKeyHandler(logger, callback);
+        return registerDbusMediaKeyHandler(logger, callback);
+    }
 }
+
+const linuxSupport = new LinuxPlatformSupport();
+export default linuxSupport;
