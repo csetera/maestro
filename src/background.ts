@@ -2,7 +2,8 @@
 
 import { app, crashReporter, protocol } from 'electron';
 import { isDevelopment } from '@/shared/Utils';
-import { createProtocol, installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import LoggerFactory from '@/shared/LoggerFactory';
 import MainProcess from '@/main/MainProcess';
 
@@ -23,7 +24,7 @@ protocol.registerSchemesAsPrivileged([
 async function configureDevelopment() {
     // Install Vue Devtools
     try {
-        await installVueDevtools()
+        await installExtension(VUEJS_DEVTOOLS);
     } catch (e) {
         logger.error('Vue Devtools failed to install: %s', e);
     }
